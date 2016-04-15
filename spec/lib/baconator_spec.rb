@@ -31,7 +31,7 @@ RSpec.describe Baconator do
     it 'seeks and finds bacon' do
       VCR.use_cassette("synopsis", :record => :new_episodes) do
         bacon.go_find_bacon
-        expect(bacon.results).to eq(3)
+        expect(bacon.results).to eq(2)
       end
     end
   end
