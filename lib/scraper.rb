@@ -4,6 +4,8 @@ require 'nokogiri'
 class Scraper
   attr_reader :url, :links, :html
 
+  WIKIPEDIA_URL = 'https://en.wikipedia.org'
+
   def initialize
     reset
   end
@@ -13,7 +15,7 @@ class Scraper
 
     @url = url
 
-    page = Nokogiri::HTML(fetch_html(url))
+    page = Nokogiri::HTML(fetch_html(WIKIPEDIA_URL + url))
 
     @links = page.css('a').map { |link| link['href'] }
   end
