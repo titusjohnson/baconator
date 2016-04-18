@@ -29,10 +29,8 @@ RSpec.describe Baconator do
     let(:bacon) { Baconator.new('https://en.wikipedia.org/wiki/Apollo_program') }
 
     it 'seeks and finds bacon' do
-      VCR.use_cassette("synopsis", :record => :new_episodes) do
-        bacon.go_find_bacon
-        expect(bacon.results).to eq(2)
-      end
+      bacon.go_find_bacon
+      expect(bacon.results).to eq(2)
     end
   end
 end
