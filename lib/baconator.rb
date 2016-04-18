@@ -1,5 +1,4 @@
 require 'tree'
-require 'scraper'
 
 class Baconator
   attr_reader :bacon_number, :bacon_path, :seen_pages, :goal_found
