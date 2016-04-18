@@ -9,7 +9,6 @@ RSpec.describe Baconator do
     end
   end
 
-  # Test disabled. Github wasn't happy about how much VCR data this pulled in.
   describe '.go_find_bacon via depth-first digging' do
     let(:bacon) { Baconator.new('https://en.wikipedia.org/wiki/Apollo_program', debug: true, seek_method: :depth) }
 
