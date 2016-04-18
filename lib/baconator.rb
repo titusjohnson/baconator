@@ -26,7 +26,12 @@ class Baconator
 
   def go_find_bacon
     return if goal_found?(@bacon_tree)
-    breadth_walk(@bacon_tree)
+    if opts[:seek_method] == :breadth
+      breadth_walk(@bacon_tree)
+    else
+      parse_node @bacon_tree
+      depth_walk(@bacon_tree)
+    end
   end
 
   # 
@@ -35,9 +40,21 @@ class Baconator
   # @param node [Tree::TreeNode] the tree node to begin parsing
   def breadth_walk(node)
     node.breadth_each do |child|
-      puts "Inspecting #{child.name} for Bacon. The Number is currently #{child.node_depth}" if opts[:debug]
+      puts "Inspecting #{child.name} for Bacon." if opts[:debug]
+      parse_node child unless child.node_depth == opts[:maximum_depth] - 1
+      return if @goal_found
+    end
+  end
+
+  def depth_walk(node)
+    return if node.node_depth == opts[:maximum_depth] - 1
+
+    node.children.each do |child|
+      puts "Inspecting #{child.name} for Bacon." if opts[:debug]
       parse_node child
       return if @goal_found
+
+      depth_walk child
     end
   end
 
@@ -49,13 +66,8 @@ class Baconator
   # 
   # @return [Tree::TreeNode]
   def parse_node(node)
-    if node.node_depth == opts[:maximum_depth]
-      puts "#{node.name} is at max depth, cannot continue." if opts[:debug]
-      return
-    end
-
     pages = @scraper.find_unique_linked_pages node.name
-    pages = pages - seen_pages
+    pages = pages - @seen_pages
     @seen_pages.concat pages
 
     pages.each do |page|

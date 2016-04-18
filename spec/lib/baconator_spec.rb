@@ -1,6 +1,6 @@
 RSpec.describe Baconator do
   describe '.go_find_bacon' do
-    let(:bacon) { Baconator.new('https://en.wikipedia.org/wiki/Apollo_program') }
+    let(:bacon) { Baconator.new('https://en.wikipedia.org/wiki/Apollo_program', debug: true) }
 
     it 'seeks and finds bacon per the given test case' do
       bacon.go_find_bacon
@@ -9,8 +9,18 @@ RSpec.describe Baconator do
     end
   end
 
+  describe '.go_find_bacon via depth-first digging' do
+    let(:bacon) { Baconator.new('https://en.wikipedia.org/wiki/Apollo_program', debug: true, seek_method: :depth) }
+
+    it 'seeks and finds bacon per the given test case' do
+      bacon.go_find_bacon
+      expect(bacon.bacon_number).to eq(3)
+      expect(bacon.bacon_path).to eq(['/wiki/Apollo_program', '/wiki/Apollo_7', '/wiki/John_L._Swigert', '/wiki/Kevin_Bacon'])
+    end
+  end
+
   describe '.go_find_bacon when we start at Kevin\'s page' do
-    let(:bacon) { Baconator.new('https://en.wikipedia.org/wiki/Kevin_Bacon') }
+    let(:bacon) { Baconator.new('https://en.wikipedia.org/wiki/Kevin_Bacon', debug: true) }
 
     it 'seeks and finds bacon' do
       bacon.go_find_bacon
@@ -18,11 +28,9 @@ RSpec.describe Baconator do
       expect(bacon.bacon_path).to eq(['/wiki/Kevin_Bacon'])
     end
   end
-
   
   describe '.go_find_bacon past the depth limit' do
-
-    let(:bacon) { Baconator.new('https://en.wikipedia.org/wiki/Anne_Ward_(writer)') }
+    let(:bacon) { Baconator.new('https://en.wikipedia.org/wiki/Anne_Ward_(writer)', debug: true) }
     
     it 'seeks and finds bacon' do
       bacon.go_find_bacon
@@ -33,7 +41,7 @@ RSpec.describe Baconator do
   end
 
   describe '.goal_found?' do
-    let(:bacon) { Baconator.new('https://en.wikipedia.org/wiki/Apollo_program') }
+    let(:bacon) { Baconator.new('https://en.wikipedia.org/wiki/Apollo_program', debug: true) }
 
     it 'returns false when given a dummy' do
       expect(bacon.goal_found?(Tree::TreeNode.new('/not/the/winner'))).to be false
