@@ -3,7 +3,7 @@ Dir[File.dirname(__FILE__) + '/lib/*'].each { |file| require file }
 puts 'Enter the source Wiki page'
 starting_page = gets.chomp.strip
 
-finder = Baconator.new(starting_page)
+finder = Baconator.new(starting_page, debug: true)
 finder.go_find_bacon
 
 if finder.goal_found

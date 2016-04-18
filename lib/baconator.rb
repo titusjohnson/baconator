@@ -1,35 +1,41 @@
 require 'tree'
 
 class Baconator
-  attr_reader :bacon_number, :bacon_path, :seen_pages, :goal_found
+  attr_reader :bacon_number, :bacon_path, :seen_pages, :goal_found, :opts
 
   GOAL_PAGE = '/wiki/Kevin_Bacon'
-  MAXIMUM_DEPTH = 3
 
-  def initialize(starting_url)
+  def initialize(starting_url, options = {})
     @starting_page = starting_url.split('.org').last
     @scraper = Scraper.new
-
     @bacon_tree = Tree::TreeNode.new(@starting_page)
     @goal_found = false
 
     @bacon_number = 0
     @bacon_path = []
     @seen_pages = []
+
+    @opts = {
+      maximum_depth: 3,
+      seek_method: :breadth,
+      debug: false
+    }
+
+    @opts.merge! options
   end
 
   def go_find_bacon
     return if goal_found?(@bacon_tree)
-    walk_tree(@bacon_tree)
+    breadth_walk(@bacon_tree)
   end
 
   # 
   # Do a breadth-first walk of the bacon tree
   # 
   # @param node [Tree::TreeNode] the tree node to begin parsing
-  def walk_tree(node)
+  def breadth_walk(node)
     node.breadth_each do |child|
-      puts "Inspecting #{child.name} for Bacon. The Number is currently #{child.node_depth}"
+      puts "Inspecting #{child.name} for Bacon. The Number is currently #{child.node_depth}" if opts[:debug]
       parse_node child
       return if @goal_found
     end
@@ -43,8 +49,8 @@ class Baconator
   # 
   # @return [Tree::TreeNode]
   def parse_node(node)
-    if node.node_depth == MAXIMUM_DEPTH
-      puts "#{node.name} is at max depth, cannot continue."
+    if node.node_depth == opts[:maximum_depth]
+      puts "#{node.name} is at max depth, cannot continue." if opts[:debug]
       return
     end
 
