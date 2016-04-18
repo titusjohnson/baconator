@@ -23,10 +23,7 @@ class Scraper
   # 
   # @return [Array] of /wiki/Linked_Pages
   def scrape_page_for_links(page)
-    puts "Fetching #{WIKIPEDIA_URL + page}"
-
     page_dom = Nokogiri::HTML(fetch_html(WIKIPEDIA_URL + page))
-
     page_dom.css('a').map { |link| link['href'] }
   end
 

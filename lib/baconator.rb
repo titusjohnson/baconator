@@ -2,79 +2,83 @@ require 'tree'
 require 'scraper'
 
 class Baconator
-  attr_reader :results
+  attr_reader :bacon_number, :bacon_path, :seen_pages, :goal_found
 
-  def initialize(starting_url, goal_page = '/wiki/Kevin_Bacon')
-    @starting_page = pageize(starting_url)
-    @goal_page = goal_page
+  GOAL_PAGE = '/wiki/Kevin_Bacon'
+  MAXIMUM_DEPTH = 3
+
+  def initialize(starting_url)
+    @starting_page = starting_url.split('.org').last
+    @scraper = Scraper.new
 
     @bacon_tree = Tree::TreeNode.new(@starting_page)
-    @scraper = Scraper.new
-    @results = 0
     @goal_found = false
+
+    @bacon_number = 0
+    @bacon_path = []
+    @seen_pages = []
   end
 
   def go_find_bacon
-    if @starting_page == @goal_page
-      @goal_found = true
-      return
-    end
-    
-    @results += 1
-
-    parse_node(@bacon_tree)
-    return if @goal_found
-    iterate_node(@bacon_tree)
-    return if @goal_found
+    return if goal_found?(@bacon_tree)
+    walk_tree(@bacon_tree)
   end
 
-  def collect_links(url)
-    Baconator.extract_desired_links(@scraper.scrape(url))
-  end
-
-  def pageize(url)
-    url.split('.org').last
-  end
-
-  def iterate_node(node)
-    @results += 1
-
-    node.children.each do |child|
-      parse_node(node)
+  # 
+  # Do a breadth-first walk of the bacon tree
+  # 
+  # @param node [Tree::TreeNode] the tree node to begin parsing
+  def walk_tree(node)
+    node.breadth_each do |child|
+      puts "Inspecting #{child.name} for Bacon. The Number is currently #{child.node_depth}"
+      parse_node child
       return if @goal_found
-    end
-
-    return if @results == 5
-  end
-
-  def parse_node(node)
-    node_links = collect_links(node.name).uniq
-
-    node_links.each do |link|
-      page = pageize(link)
-      if page == @goal_page
-        @goal_found = true
-        return
-      end
-      @bacon_tree << Tree::TreeNode.new(page) rescue nil
     end
   end
 
   #
-  # Wikipedia uses relative links for everything we care about
-  # And has lots of other links we don't care about.
-  # Return only the subset of desired wiki pages
-  def self.extract_desired_links(links)
-    links.reduce([]) do |subset, link| 
-      subset << link if whitelisted? link
-      subset
+  # Given tree node, retrieve all links for the page, check their bacon status,
+  # then add unseen links as children of the current node.
+  # 
+  # @param node [Tree::TreeNode]
+  # 
+  # @return [Tree::TreeNode]
+  def parse_node(node)
+    if node.node_depth == MAXIMUM_DEPTH
+      puts "#{node.name} is at max depth, cannot continue."
+      return
     end
+
+    pages = @scraper.find_unique_linked_pages node.name
+    pages = pages - seen_pages
+    @seen_pages.concat pages
+
+    pages.each do |page|
+      new_page_node = Tree::TreeNode.new(page)
+      node << new_page_node
+      return if goal_found?(new_page_node)
+    end
+
+    node
   end
 
-  def self.whitelisted?(link)
-    return false unless link
-    # Links with a : are media pages
-    return false if /:/.match link
-    link[0..5] == '/wiki/' ? true : false
+  # 
+  # Check if a node is the goal
+  # Set attributes if the node is the goal
+  # 
+  # @param page [Tree::TreeNode]
+  # 
+  # @return [Boolean]
+  def goal_found?(page)
+    if page.name == GOAL_PAGE
+      @goal_found = true
+      @bacon_number = page.node_depth
+
+      @bacon_path << page.name
+      @bacon_path.concat page.parentage.map { |n| n.name } if page.parentage
+      @bacon_path.reverse!
+    end
+
+    goal_found
   end
 end
