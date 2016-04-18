@@ -46,6 +46,11 @@ class Baconator
     end
   end
 
+  # 
+  # Do a depth-first walk of the bacon tree
+  # Depending on the depth allowed, this seems much slower by default
+  # 
+  # @param node [Tree::TreeNode] the tree node to begin parsing
   def depth_walk(node)
     return if node.node_depth == opts[:maximum_depth] - 1
 
@@ -82,6 +87,9 @@ class Baconator
   # 
   # Check if a node is the goal
   # Set attributes if the node is the goal
+  # 
+  # TODO: I'm not overly happy with this method, it's doing things
+  #       outside of its named mandate.
   # 
   # @param page [Tree::TreeNode]
   # 

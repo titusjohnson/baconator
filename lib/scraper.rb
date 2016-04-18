@@ -51,21 +51,16 @@ class Scraper
   # Verify that a given relative page URL is something that will
   # lead us to bacon.
   # 
+  # - Some page links have no href attribute, leading to empty submissions
+  # - Relative wikipedia links with a : in them are media pages
+  # - We only care about relative links that start with /wiki/
+  # 
   # @param link [String] a /wiki/Page_Url_string
   # 
   # @return [Boolean]
   def whitelisted_page?(page)
     return false unless page
-    # pages with a : are media pages
     return false if /:/.match page
-    # We only care about /wiki/ pages
     page[0..5] == '/wiki/' ? true : false
-  end
-
-private
-
-  def reset
-    @url = ''
-    @links = []
   end
 end

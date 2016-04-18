@@ -6,8 +6,9 @@ starting_page = gets.chomp.strip
 finder = Baconator.new(starting_page, debug: true)
 finder.go_find_bacon
 
-if finder.goal_found
-  puts '....'
+puts '....'
+
+if finder.goal_found  
   puts "The Bacon number for #{starting_page} is #{finder.bacon_number}."
   puts "The Bacon path is #{finder.bacon_path.join(" => ")}"
 else
