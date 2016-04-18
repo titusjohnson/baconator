@@ -10,15 +10,15 @@ RSpec.describe Baconator do
   end
 
   # Test disabled. Github wasn't happy about how much VCR data this pulled in.
-  # describe '.go_find_bacon via depth-first digging' do
-  #   let(:bacon) { Baconator.new('https://en.wikipedia.org/wiki/Apollo_program', debug: true, seek_method: :depth) }
+  describe '.go_find_bacon via depth-first digging' do
+    let(:bacon) { Baconator.new('https://en.wikipedia.org/wiki/Apollo_program', debug: true, seek_method: :depth) }
 
-  #   it 'seeks and finds bacon per the given test case' do
-  #     bacon.go_find_bacon
-  #     expect(bacon.bacon_number).to eq(3)
-  #     expect(bacon.bacon_path).to eq(['/wiki/Apollo_program', '/wiki/Apollo_7', '/wiki/John_L._Swigert', '/wiki/Kevin_Bacon'])
-  #   end
-  # end
+    it 'seeks and finds bacon per the given test case' do
+      bacon.go_find_bacon
+      expect(bacon.bacon_number).to eq(3)
+      expect(bacon.bacon_path).to eq(['/wiki/Apollo_program', '/wiki/Apollo_7', '/wiki/John_L._Swigert', '/wiki/Kevin_Bacon'])
+    end
+  end
 
   describe '.go_find_bacon when we start at Kevin\'s page' do
     let(:bacon) { Baconator.new('https://en.wikipedia.org/wiki/Kevin_Bacon', debug: true) }
